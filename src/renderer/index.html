@@ -2,9 +2,14 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APPLY TRACK - Glassmorphic Windows Job Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>APPLY TRACK - Glassmorphic Job Tracker</title>
   <link rel="icon" type="image/png" href="app_icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f1d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -30,6 +35,12 @@
     </div>
     
     <div class="titlebar-controls">
+      <!-- Add to Home Screen Button (Mobile / Android) -->
+      <button class="theme-toggle-btn" id="btn-add-to-homescreen" title="Add APPLY TRACK to Home Screen" style="display: none; background: rgba(45, 212, 191, 0.15); border-color: rgba(45, 212, 191, 0.4); color: var(--brand-teal);">
+        <span>📲</span>
+        <span>Add to Home</span>
+      </button>
+
       <!-- Light / Dark Mode Toggle Button -->
       <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode">
         <span id="theme-toggle-icon">☀️</span>

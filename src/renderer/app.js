@@ -23,9 +23,19 @@
     { id: 'Rejected', label: 'Rejected', color: '#f43f5e', pillClass: 'pill-rose' }
   ];
 
-  // Pure C++ Winsock REST API Client
+  // Multi-Platform API Client (Pure C++ Winsock on Windows / Native SQLite Bridge on Android)
+  const isAndroid = typeof AndroidBridge !== 'undefined';
+
   const API = {
     async getApplications() {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.getApplications());
+        } catch (e) {
+          console.error('Android getApplications error:', e);
+          return [];
+        }
+      }
       try {
         const res = await fetch('/api/applications');
         return await res.json();
@@ -35,6 +45,13 @@
       }
     },
     async saveApplication(appData) {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.saveApplication(JSON.stringify(appData)));
+        } catch (e) {
+          return { success: false, error: e.message };
+        }
+      }
       const res = await fetch('/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,6 +60,13 @@
       return await res.json();
     },
     async updateStage(id, stage) {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.updateStage(id, stage));
+        } catch (e) {
+          return { success: false, error: e.message };
+        }
+      }
       const res = await fetch('/api/stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,6 +75,13 @@
       return await res.json();
     },
     async deleteApplication(id) {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.deleteApplication(id));
+        } catch (e) {
+          return { success: false, error: e.message };
+        }
+      }
       const res = await fetch('/api/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,6 +90,13 @@
       return await res.json();
     },
     async getStorageInfo() {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.getStorageInfo());
+        } catch (e) {
+          return { storageDir: 'Android Internal Sandbox', dbPath: 'jobtracker.db', dbSize: 0, defaultDir: '', isCustom: false };
+        }
+      }
       try {
         const res = await fetch('/api/storage');
         return await res.json();
@@ -67,6 +105,9 @@
       }
     },
     async setStorageLocation(dir, moveExisting = true) {
+      if (typeof AndroidBridge !== 'undefined') {
+        return { success: false, error: 'Android uses internal app sandbox SQLite storage.' };
+      }
       const res = await fetch('/api/storage/location', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,14 +116,43 @@
       return await res.json();
     },
     async browseStorageFolder() {
+      if (typeof AndroidBridge !== 'undefined') {
+        return { success: false, cancelled: true };
+      }
       const res = await fetch('/api/storage/browse', { method: 'POST' });
       return await res.json();
     },
     async openStorageFolder() {
+      if (typeof AndroidBridge !== 'undefined') {
+        if (AndroidBridge.showToast) AndroidBridge.showToast('Database stored securely in Android internal storage');
+        return;
+      }
       await fetch('/api/storage/open', { method: 'POST' });
     },
     async clearData() {
+      if (typeof AndroidBridge !== 'undefined') {
+        try {
+          return JSON.parse(AndroidBridge.clearData());
+        } catch (e) {
+          return { success: false };
+        }
+      }
       await fetch('/api/clear', { method: 'POST' });
+    },
+    async exportCsv() {
+      if (typeof AndroidBridge !== 'undefined') {
+        const csv = AndroidBridge.exportCsv();
+        if (AndroidBridge.shareCsv) {
+          AndroidBridge.shareCsv(csv);
+        }
+        return csv;
+      }
+      window.location.href = '/api/export/csv';
+    },
+    pinToHomeScreen() {
+      if (typeof AndroidBridge !== 'undefined' && AndroidBridge.pinToHomeScreen) {
+        AndroidBridge.pinToHomeScreen();
+      }
     }
   };
 
@@ -194,6 +264,36 @@
     });
 
     setupStorageControls();
+
+    // Home Screen shortcut button (Android Native & PWA)
+    const btnHomeScreen = document.getElementById('btn-add-to-homescreen');
+    let deferredPrompt = null;
+    if (typeof AndroidBridge !== 'undefined') {
+      if (btnHomeScreen) {
+        btnHomeScreen.style.display = 'inline-flex';
+        btnHomeScreen.addEventListener('click', () => {
+          API.pinToHomeScreen();
+        });
+      }
+    } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (btnHomeScreen) {
+          btnHomeScreen.style.display = 'inline-flex';
+          btnHomeScreen.addEventListener('click', async () => {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              const { outcome } = await deferredPrompt.userChoice;
+              if (outcome === 'accepted') {
+                btnHomeScreen.style.display = 'none';
+              }
+              deferredPrompt = null;
+            }
+          });
+        }
+      });
+    }
 
     const searchInput = document.getElementById('global-search-input');
     searchInput.addEventListener('input', (e) => {

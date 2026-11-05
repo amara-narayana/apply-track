@@ -12,7 +12,11 @@ ApplyTrack.exe
 
 # Build output & Distribution archives
 dist/
+android/build/
 *.zip
+*.apk
+*.idsig
+*.keystore
 
 # OS & Editor temp files
 .vscode/

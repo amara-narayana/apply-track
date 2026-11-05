@@ -1,52 +1,62 @@
-# APPLY TRACK - Native Windows Job Tracker
+# APPLY TRACK - Cross-Platform Job Application Tracker
 
-A fast, lightweight, and 100% native Windows desktop application with **Glassmorphism**, **Light and Dark Mode**, a **minimal C++ backend (Winsock2 + SQLite3)**, **normal SQL**, and **Windows Internal Storage (`%APPDATA%`)**.
+A fast, lightweight, and privacy-first application with **Glassmorphism**, **Light and Dark Mode**, a **native C++ Windows backend**, a **native Android app**, **normal SQL**, and **offline SQLite Storage**.
 
-> **Direct Download**: Download the standalone single executable [**`ApplyTrack.exe`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.exe) directly from the GitHub Release! No installer, no zip extraction, no DLLs, and zero Node.js needed.
+> **Direct Downloads**:
+> - 📱 **Android App**: [**`ApplyTrack.apk`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.apk) *(445 KB)* - Installs directly and automatically prompts to add to your Home Screen!
+> - 💻 **Windows Desktop**: [**`ApplyTrack.exe`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.exe) *(5.25 MB)* - Standalone portable binary, no installer, no DLLs, zero Node.js.
 
 ---
 
 ## 💎 Features & Capabilities
 
-- **Direct Single Executable (`ApplyTrack.exe`)**:
+- **Android Mobile Application (`ApplyTrack.apk`)**:
+  - **Auto Home Screen Shortcut**: Built-in Android `ShortcutManager` automatically prompts to pin the official **APPLY TRACK** icon to the user's home screen.
+  - **Offline SQLite Storage**: Pure Android internal sandbox SQLite database (`jobtracker.db`).
+  - **Native Intent Sharing**: One-tap CSV export with native Android share sheet (Gmail, WhatsApp, Drive, etc.).
+  - **Ultra-Compact**: Lightweight signed APK under 460 KB.
+- **Direct Windows Executable (`ApplyTrack.exe`)**:
   - 100% standalone portable binary with zero external dependencies.
   - Statically linked C++ runtime and embedded SQLite3 engine.
   - All web assets (HTML5, CSS3, JavaScript, icons, branding banners) are embedded directly inside the `.exe`.
+  - **Custom Database Location**: Change and save your SQLite database to any directory, external drive, or sync folder directly from the app.
 - **100% Native & Zero Node.js**:
   - No `node_modules`, no npm, no JavaScript runtime overhead.
-  - Minimal memory footprint (< 15 MB RAM).
+  - Minimal memory footprint (< 15 MB RAM on Windows, instant start on Android).
 - **Glassmorphic Light & Dark Mode**:
   - **Dark Mode**: Deep atmospheric obsidian glass, glowing teal and orange accents, frosted panels.
   - **Light Mode**: Frosted ice glassmorphism with crisp high-contrast text and translucent white panels.
   - **Toggle**: One-click theme toggle in the titlebar with persistent settings.
-- **Dropdown Controls**:
-  - Custom SVG chevron arrows with theme-aware styling.
-  - Explicit option backgrounds (`#0f172a` in dark mode, `#ffffff` in light mode) guaranteeing 100% visibility and legibility.
 - **Normal SQL Relational Database**:
-  - Real SQLite 3 database stored in Windows Internal Storage: `%APPDATA%\JobApplicationTracker\jobtracker.db`.
+  - Real SQLite 3 database with prepared statements and transactions.
   - Normal SQL operations: `CREATE TABLE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`.
 - **Zero Predefined Fake Data**:
   - Starts 100% clean and pristine. Zero mock records.
-- **Custom Application Icon & Brand**:
-  - Custom icon extracted from user logo (clipboard, checklist, and magnifying growth arrow) embedded into the `.exe` binary.
 
 ---
 
-## 🚀 How to Run
+## 🚀 How to Run & Install
 
-### Direct Standalone Binary (Recommended)
+### Android Mobile
+1. Download [**`ApplyTrack.apk`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.apk).
+2. Tap the APK to install on your Android device.
+3. Open **APPLY TRACK** — the app will automatically prompt you to pin the shortcut directly to your **Home screen**!
+
+### Windows Desktop (Recommended)
 1. Download [**`ApplyTrack.exe`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.exe).
 2. Double-click `ApplyTrack.exe` anywhere on your computer.
 3. The app will launch immediately with full glassmorphism UI connected to your internal SQLite database!
 
-### Build from Source
+### Build Windows from Source
 ```powershell
-# 1. Embed renderer assets (optional, header included in repo)
 python scripts/embed_assets.py
-
-# 2. Compile Windows resource & executable
 windres -I . -i src/app_icon.rc -O coff -o src/app_icon.res
-g++ -O3 -I src -static -static-libgcc -static-libstdc++ src/backend.cpp src/app_icon.res -lsqlite3 -lws2_32 -o ApplyTrack.exe
+g++ -O3 -I src -static -static-libgcc -static-libstdc++ src/backend.cpp src/app_icon.res -lsqlite3 -lws2_32 -lshell32 -lole32 -o ApplyTrack.exe
+```
+
+### Build Android APK from Source
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_android_apk.ps1
 ```
 
 ---
