@@ -184,9 +184,12 @@
         <div class="glass-metric-card" style="margin-bottom: 24px; padding: 26px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main);">Windows Internal SQLite Storage</h2>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main);">Windows Internal SQLite Storage</h2>
+                <span class="brand-vault-badge" id="storage-type-badge" style="font-size: 11px; padding: 2px 8px;">AppData Vault</span>
+              </div>
               <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
-                Direct SQLite 3 database (`jobtracker.db`) located in your local Windows Roaming profile.
+                Direct SQLite 3 database (`jobtracker.db`) with full transactional persistence.
               </p>
             </div>
             <button class="glass-btn glass-btn-primary" id="btn-open-explorer-storage">
@@ -196,6 +199,49 @@
 
           <div style="background: var(--glass-input-bg); border: 1px solid var(--glass-border); padding: 12px 16px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; color: var(--brand-teal); word-break: break-all;" id="storage-full-path">
             %APPDATA%\JobApplicationTracker\jobtracker.db
+          </div>
+        </div>
+
+        <!-- Custom Database Storage Location Manager -->
+        <div class="glass-metric-card" style="margin-bottom: 24px; padding: 26px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 style="font-size: 17px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <span id="icon-custom-storage-folder"></span> Custom Database Storage Location
+              </h2>
+              <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+                Change your database folder to any internal or external drive, OneDrive, Dropbox, or custom folder. The new path is saved and persists across app restarts.
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <label class="form-label-glass" style="margin-bottom: 8px; display: block; font-weight: 600;">
+              Database Folder Path:
+            </label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" class="form-ctrl-glass" id="input-custom-db-dir" placeholder="e.g. D:\JobTrackerData or C:\MyVault" style="flex: 1; min-width: 280px; font-family: var(--font-mono); font-size: 13px;">
+              <button class="glass-btn glass-btn-secondary" id="btn-browse-db-folder" type="button" title="Select folder using Windows Folder Browser">
+                <span id="icon-browse-folder"></span> Browse...
+              </button>
+              <button class="glass-btn glass-btn-primary" id="btn-save-db-location" type="button" title="Save new database location">
+                <span id="icon-save-location"></span> Save Location
+              </button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); cursor: pointer;">
+                <input type="checkbox" id="chk-move-existing-db" checked style="accent-color: var(--brand-teal); width: 16px; height: 16px; cursor: pointer;">
+                <span>Copy existing database and applications to the new location</span>
+              </label>
+
+              <button class="glass-mini-btn" id="btn-reset-db-default" type="button" style="padding: 6px 12px; height: auto; font-size: 12px; color: var(--text-muted);" title="Revert to standard Windows AppData folder">
+                Reset to Default (%APPDATA%)
+              </button>
+            </div>
+
+            <!-- Feedback Alert Banner -->
+            <div id="storage-feedback-alert" style="display: none; margin-top: 14px; padding: 12px 16px; border-radius: var(--radius-md); font-size: 13px; line-height: 1.5;"></div>
           </div>
         </div>
 

@@ -63,8 +63,20 @@
         const res = await fetch('/api/storage');
         return await res.json();
       } catch (e) {
-        return { storageDir: '', dbPath: '', dbSize: 0 };
+        return { storageDir: '', dbPath: '', dbSize: 0, defaultDir: '', isCustom: false };
       }
+    },
+    async setStorageLocation(dir, moveExisting = true) {
+      const res = await fetch('/api/storage/location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dir, move_existing: moveExisting })
+      });
+      return await res.json();
+    },
+    async browseStorageFolder() {
+      const res = await fetch('/api/storage/browse', { method: 'POST' });
+      return await res.json();
     },
     async openStorageFolder() {
       await fetch('/api/storage/open', { method: 'POST' });
@@ -131,7 +143,10 @@
       'icon-search-bar': Icons.search,
       'icon-plus-btn': Icons.plus,
       'icon-download-csv': Icons.download,
-      'icon-folder-storage-btn': Icons.folder
+      'icon-folder-storage-btn': Icons.folder,
+      'icon-custom-storage-folder': Icons.hardDrive,
+      'icon-browse-folder': Icons.folder,
+      'icon-save-location': Icons.check
     };
     for (const [id, svg] of Object.entries(map)) {
       const el = document.getElementById(id);
@@ -178,8 +193,7 @@
       });
     });
 
-    document.getElementById('btn-quick-explorer').addEventListener('click', () => API.openStorageFolder());
-    document.getElementById('btn-open-explorer-storage').addEventListener('click', () => API.openStorageFolder());
+    setupStorageControls();
 
     const searchInput = document.getElementById('global-search-input');
     searchInput.addEventListener('input', (e) => {
@@ -589,8 +603,123 @@
         document.getElementById('storage-full-path').textContent = storageInfo.dbPath;
         document.getElementById('sidebar-db-path').textContent = storageInfo.dbPath;
       }
+      const inputDir = document.getElementById('input-custom-db-dir');
+      if (inputDir && document.activeElement !== inputDir && storageInfo.storageDir) {
+        inputDir.value = storageInfo.storageDir;
+      }
+      const badge = document.getElementById('storage-type-badge');
+      if (badge) {
+        if (storageInfo.isCustom) {
+          badge.textContent = 'Custom Drive';
+          badge.style.background = 'rgba(249, 115, 22, 0.18)';
+          badge.style.borderColor = 'rgba(249, 115, 22, 0.4)';
+          badge.style.color = '#f97316';
+        } else {
+          badge.textContent = 'AppData Vault';
+          badge.style.background = 'rgba(45, 212, 191, 0.12)';
+          badge.style.borderColor = 'rgba(45, 212, 191, 0.3)';
+          badge.style.color = '#2dd4bf';
+        }
+      }
       document.getElementById('storage-db-size').textContent = formatBytes(storageInfo.dbSize);
       document.getElementById('storage-total-records').textContent = applications.length;
+    }
+  }
+
+  function setupStorageControls() {
+    document.getElementById('btn-quick-explorer').addEventListener('click', () => API.openStorageFolder());
+    document.getElementById('btn-open-explorer-storage').addEventListener('click', () => API.openStorageFolder());
+
+    const btnSaveDbLoc = document.getElementById('btn-save-db-location');
+    const btnBrowseDbLoc = document.getElementById('btn-browse-db-folder');
+    const btnResetDbDefault = document.getElementById('btn-reset-db-default');
+    const inputCustomDir = document.getElementById('input-custom-db-dir');
+    const chkMoveDb = document.getElementById('chk-move-existing-db');
+    const feedbackAlert = document.getElementById('storage-feedback-alert');
+
+    function showStorageFeedback(msg, isSuccess = true) {
+      if (!feedbackAlert) return;
+      feedbackAlert.style.display = 'block';
+      if (isSuccess) {
+        feedbackAlert.style.background = 'rgba(16, 185, 129, 0.15)';
+        feedbackAlert.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+        feedbackAlert.style.color = '#10b981';
+        feedbackAlert.innerHTML = `<strong>✓ Success:</strong> ${msg}`;
+      } else {
+        feedbackAlert.style.background = 'rgba(239, 68, 68, 0.15)';
+        feedbackAlert.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+        feedbackAlert.style.color = '#ef4444';
+        feedbackAlert.innerHTML = `<strong>✗ Error:</strong> ${msg}`;
+      }
+    }
+
+    if (btnBrowseDbLoc) {
+      btnBrowseDbLoc.addEventListener('click', async () => {
+        btnBrowseDbLoc.disabled = true;
+        try {
+          const res = await API.browseStorageFolder();
+          if (res && res.success && res.path) {
+            inputCustomDir.value = res.path;
+            showStorageFeedback(`Selected folder: <code>${escapeHtml(res.path)}</code>. Click "Save Location" to apply.`, true);
+          }
+        } catch (e) {
+          console.error(e);
+        } finally {
+          btnBrowseDbLoc.disabled = false;
+        }
+      });
+    }
+
+    if (btnSaveDbLoc) {
+      btnSaveDbLoc.addEventListener('click', async () => {
+        const targetDir = inputCustomDir.value.trim();
+        if (!targetDir) {
+          showStorageFeedback('Please enter or browse to a valid directory path.', false);
+          return;
+        }
+        btnSaveDbLoc.disabled = true;
+        btnSaveDbLoc.textContent = 'Saving...';
+        try {
+          const moveExisting = chkMoveDb ? chkMoveDb.checked : true;
+          const res = await API.setStorageLocation(targetDir, moveExisting);
+          if (res && res.success) {
+            showStorageFeedback(`Database folder updated and saved to: <code>${escapeHtml(res.storageDir)}</code>`, true);
+            applications = await API.getApplications();
+            await renderStorage();
+            updateCounts();
+          } else {
+            showStorageFeedback(res.error || 'Failed to change database location.', false);
+          }
+        } catch (e) {
+          showStorageFeedback('Network error while saving database location: ' + e.message, false);
+        } finally {
+          btnSaveDbLoc.disabled = false;
+          btnSaveDbLoc.innerHTML = `${Icons.check} Save Location`;
+        }
+      });
+    }
+
+    if (btnResetDbDefault) {
+      btnResetDbDefault.addEventListener('click', async () => {
+        if (!confirm('Revert database storage location back to default Windows AppData?')) return;
+        btnResetDbDefault.disabled = true;
+        try {
+          const res = await API.setStorageLocation('', true);
+          if (res && res.success) {
+            inputCustomDir.value = res.storageDir;
+            showStorageFeedback('Reverted database back to default Windows AppData location.', true);
+            applications = await API.getApplications();
+            await renderStorage();
+            updateCounts();
+          } else {
+            showStorageFeedback(res.error || 'Failed to revert location.', false);
+          }
+        } catch (e) {
+          showStorageFeedback(e.message, false);
+        } finally {
+          btnResetDbDefault.disabled = false;
+        }
+      });
     }
   }
 

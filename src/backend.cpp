@@ -85,6 +85,23 @@ string jsonGetString(const string& json, const string& key, const string& def = 
     }
 }
 
+// Helper: Boolean JSON extractor
+bool jsonGetBool(const string& json, const string& key, bool def = true) {
+    string target = "\"" + key + "\"";
+    size_t pos = json.find(target);
+    if (pos == string::npos) return def;
+    pos = json.find(':', pos);
+    if (pos == string::npos) return def;
+    while (pos < json.size() && (json[pos] == ':' || json[pos] == ' ' || json[pos] == '\t' || json[pos] == '\n' || json[pos] == '\r')) {
+        pos++;
+    }
+    if (pos < json.size()) {
+        if (json.compare(pos, 4, "true") == 0 || json.compare(pos, 4, "TRUE") == 0) return true;
+        if (json.compare(pos, 5, "false") == 0 || json.compare(pos, 5, "FALSE") == 0) return false;
+    }
+    return def;
+}
+
 // Generate simple unique ID
 string generateId() {
     static int counter = 0;
@@ -94,33 +111,66 @@ string generateId() {
     return oss.str();
 }
 
-// Initialize SQLite in Windows Internal Storage
-bool initDatabase() {
+// Helper: Create directory and parent directories recursively
+bool createDirectoriesRecursive(const string& path) {
+    if (path.empty()) return false;
+    char tmp[MAX_PATH];
+    strncpy(tmp, path.c_str(), sizeof(tmp) - 1);
+    tmp[sizeof(tmp) - 1] = '\0';
+    for (char* p = tmp + 1; *p; p++) {
+        if (*p == '/' || *p == '\\') {
+            char orig = *p;
+            *p = '\0';
+            if (!(strlen(tmp) == 2 && tmp[1] == ':')) {
+                CreateDirectoryA(tmp, NULL);
+            }
+            *p = orig;
+        }
+    }
+    return CreateDirectoryA(tmp, NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+}
+
+// Helper: Get standard Windows AppData base storage directory
+string getDefaultAppDataDir() {
     char* appdata = getenv("APPDATA");
     if (!appdata) {
         char path[MAX_PATH];
         if (SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, path) == S_OK) {
-            g_storageDir = string(path) + "\\JobApplicationTracker";
-        } else {
-            g_storageDir = ".\\JobApplicationTracker";
+            return string(path) + "\\JobApplicationTracker";
         }
-    } else {
-        g_storageDir = string(appdata) + "\\JobApplicationTracker";
+        return ".\\JobApplicationTracker";
     }
+    return string(appdata) + "\\JobApplicationTracker";
+}
 
-    CreateDirectoryA(g_storageDir.c_str(), NULL);
-    string attachDir = g_storageDir + "\\attachments";
-    CreateDirectoryA(attachDir.c_str(), NULL);
-    string backupDir = g_storageDir + "\\backups";
-    CreateDirectoryA(backupDir.c_str(), NULL);
+// Helper: Get path to storage config file
+string getConfigFile() {
+    return getDefaultAppDataDir() + "\\config.json";
+}
 
-    g_dbPath = g_storageDir + "\\jobtracker.db";
+// Helper: Load configured database directory from config.json
+string loadConfiguredDbDir() {
+    string configFile = getConfigFile();
+    ifstream in(configFile.c_str());
+    if (!in.is_open()) return "";
+    string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+    return jsonGetString(content, "db_dir", "");
+}
 
-    if (sqlite3_open(g_dbPath.c_str(), &db) != SQLITE_OK) {
-        cerr << "Failed to open SQLite database: " << sqlite3_errmsg(db) << endl;
-        return false;
-    }
+// Helper: Save configured database directory to config.json
+bool saveConfiguredDbDir(const string& dir) {
+    string defDir = getDefaultAppDataDir();
+    createDirectoriesRecursive(defDir);
+    string configFile = getConfigFile();
+    ofstream out(configFile.c_str());
+    if (!out.is_open()) return false;
+    out << "{\n  \"db_dir\": \"" << jsonEscape(dir) << "\"\n}\n";
+    return true;
+}
 
+// Ensure database schema and tables exist
+bool ensureDatabaseSchema() {
+    if (!db) return false;
     const char* sqlCreate = 
         "CREATE TABLE IF NOT EXISTS applications ("
         "  id TEXT PRIMARY KEY,"
@@ -156,12 +206,143 @@ bool initDatabase() {
 
     char* errMsg = nullptr;
     if (sqlite3_exec(db, sqlCreate, nullptr, nullptr, &errMsg) != SQLITE_OK) {
-        cerr << "SQLite table init error: " << errMsg << endl;
-        sqlite3_free(errMsg);
+        cerr << "SQLite table init error: " << (errMsg ? errMsg : "unknown") << endl;
+        if (errMsg) sqlite3_free(errMsg);
+        return false;
+    }
+    return true;
+}
+
+// Initialize SQLite database (using saved custom directory or Windows internal AppData default)
+bool initDatabase() {
+    string defaultDir = getDefaultAppDataDir();
+    createDirectoriesRecursive(defaultDir);
+
+    string configuredDir = loadConfiguredDbDir();
+    if (!configuredDir.empty()) {
+        g_storageDir = configuredDir;
+    } else {
+        g_storageDir = defaultDir;
+    }
+
+    createDirectoriesRecursive(g_storageDir);
+    string attachDir = g_storageDir + "\\attachments";
+    CreateDirectoryA(attachDir.c_str(), NULL);
+    string backupDir = g_storageDir + "\\backups";
+    CreateDirectoryA(backupDir.c_str(), NULL);
+
+    g_dbPath = g_storageDir + "\\jobtracker.db";
+
+    if (sqlite3_open(g_dbPath.c_str(), &db) != SQLITE_OK) {
+        cerr << "Failed to open SQLite database at: " << g_dbPath << ". Falling back to AppData default." << endl;
+        g_storageDir = defaultDir;
+        g_dbPath = g_storageDir + "\\jobtracker.db";
+        createDirectoriesRecursive(g_storageDir);
+        if (sqlite3_open(g_dbPath.c_str(), &db) != SQLITE_OK) {
+            cerr << "Failed to open default SQLite database: " << sqlite3_errmsg(db) << endl;
+            return false;
+        }
+    }
+
+    return ensureDatabaseSchema();
+}
+
+// Dynamically change and save database storage location to any folder
+bool changeDatabaseLocation(string newDir, bool moveExisting, string& err) {
+    while (!newDir.empty() && (newDir.back() == ' ' || newDir.back() == '\t' || newDir.back() == '\r' || newDir.back() == '\n')) {
+        newDir.pop_back();
+    }
+    while (newDir.size() > 3 && (newDir.back() == '\\' || newDir.back() == '/')) {
+        newDir.pop_back();
+    }
+
+    if (newDir.empty()) {
+        newDir = getDefaultAppDataDir();
+    }
+
+    // Expand environment variables
+    char expanded[MAX_PATH];
+    if (ExpandEnvironmentStringsA(newDir.c_str(), expanded, MAX_PATH) > 0) {
+        newDir = string(expanded);
+    }
+
+    for (char& c : newDir) {
+        if (c == '/') c = '\\';
+    }
+
+    if (!createDirectoriesRecursive(newDir)) {
+        err = "Failed to create directory: " + newDir;
         return false;
     }
 
+    string newAttachDir = newDir + "\\attachments";
+    CreateDirectoryA(newAttachDir.c_str(), NULL);
+    string newBackupDir = newDir + "\\backups";
+    CreateDirectoryA(newBackupDir.c_str(), NULL);
+
+    string newDbPath = newDir + "\\jobtracker.db";
+
+    if (_stricmp(g_dbPath.c_str(), newDbPath.c_str()) == 0) {
+        saveConfiguredDbDir(newDir == getDefaultAppDataDir() ? "" : newDir);
+        return true;
+    }
+
+    if (moveExisting && !g_dbPath.empty()) {
+        if (db) {
+            sqlite3_wal_checkpoint_v2(db, NULL, SQLITE_CHECKPOINT_FULL, NULL, NULL);
+            sqlite3_close(db);
+            db = nullptr;
+        }
+
+        if (GetFileAttributesA(g_dbPath.c_str()) != INVALID_FILE_ATTRIBUTES) {
+            if (!CopyFileA(g_dbPath.c_str(), newDbPath.c_str(), FALSE)) {
+                sqlite3_open(g_dbPath.c_str(), &db);
+                err = "Failed to copy database file to " + newDbPath;
+                return false;
+            }
+        }
+    } else {
+        if (db) {
+            sqlite3_close(db);
+            db = nullptr;
+        }
+    }
+
+    if (sqlite3_open(newDbPath.c_str(), &db) != SQLITE_OK) {
+        err = "Failed to open SQLite database at: " + newDbPath;
+        sqlite3_open(g_dbPath.c_str(), &db);
+        return false;
+    }
+
+    ensureDatabaseSchema();
+
+    g_storageDir = newDir;
+    g_dbPath = newDbPath;
+
+    saveConfiguredDbDir(newDir == getDefaultAppDataDir() ? "" : newDir);
     return true;
+}
+
+// Native Windows folder picker dialog
+string chooseFolderDialog() {
+    bool coInited = SUCCEEDED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+    char path[MAX_PATH] = {0};
+    BROWSEINFOA bi = {0};
+    bi.lpszTitle = "Select New Database Storage Folder for APPLY TRACK";
+    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+    LPITEMIDLIST pidl = SHBrowseForFolderA(&bi);
+    if (pidl != 0) {
+        SHGetPathFromIDListA(pidl, path);
+        IMalloc* imalloc = 0;
+        if (SUCCEEDED(SHGetMalloc(&imalloc))) {
+            imalloc->Free(pidl);
+            imalloc->Release();
+        }
+    }
+    if (coInited) {
+        CoUninitialize();
+    }
+    return string(path);
 }
 
 // Log activity
@@ -584,9 +765,39 @@ void runHttpServer() {
                 s << "{"
                   << "\"storageDir\":\"" << jsonEscape(g_storageDir) << "\","
                   << "\"dbPath\":\"" << jsonEscape(g_dbPath) << "\","
+                  << "\"defaultDir\":\"" << jsonEscape(getDefaultAppDataDir()) << "\","
+                  << "\"isCustom\":" << (_stricmp(g_storageDir.c_str(), getDefaultAppDataDir().c_str()) != 0 ? "true" : "false") << ","
                   << "\"dbSize\":" << getFileSize(g_dbPath)
                   << "}";
                 responseBody = s.str();
+                contentType = "application/json";
+            } else if (method == "POST" && uri == "/api/storage/location") {
+                string targetDir = jsonGetString(body, "dir");
+                bool moveExisting = jsonGetBool(body, "move_existing", true);
+                string err = "";
+                if (changeDatabaseLocation(targetDir, moveExisting, err)) {
+                    logActivity("STORAGE_LOCATION", "Database folder updated to: " + g_storageDir);
+                    ostringstream s;
+                    s << "{"
+                      << "\"success\":true,"
+                      << "\"storageDir\":\"" << jsonEscape(g_storageDir) << "\","
+                      << "\"dbPath\":\"" << jsonEscape(g_dbPath) << "\","
+                      << "\"defaultDir\":\"" << jsonEscape(getDefaultAppDataDir()) << "\","
+                      << "\"isCustom\":" << (_stricmp(g_storageDir.c_str(), getDefaultAppDataDir().c_str()) != 0 ? "true" : "false") << ","
+                      << "\"dbSize\":" << getFileSize(g_dbPath)
+                      << "}";
+                    responseBody = s.str();
+                } else {
+                    responseBody = "{\"success\":false,\"error\":\"" + jsonEscape(err) + "\"}";
+                }
+                contentType = "application/json";
+            } else if (method == "POST" && uri == "/api/storage/browse") {
+                string selected = chooseFolderDialog();
+                if (!selected.empty()) {
+                    responseBody = "{\"success\":true,\"path\":\"" + jsonEscape(selected) + "\"}";
+                } else {
+                    responseBody = "{\"success\":false,\"cancelled\":true}";
+                }
                 contentType = "application/json";
             } else if (method == "POST" && uri == "/api/storage/open") {
                 ShellExecuteA(NULL, "open", "explorer.exe", g_storageDir.c_str(), NULL, SW_SHOWNORMAL);
