@@ -8,6 +8,10 @@
 *.db-wal
 *.db-shm
 
+# Build output & Distribution archives
+dist/
+*.zip
+
 # OS & Editor temp files
 .vscode/
 .idea/
