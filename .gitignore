@@ -1,6 +1,8 @@
 # Binaries & Object files
 *.o
 *.obj
+*.res
+ApplyTrack.exe
 
 # Local SQLite databases & Windows Internal Storage data
 *.db

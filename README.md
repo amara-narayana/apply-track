@@ -2,15 +2,19 @@
 
 A fast, lightweight, and 100% native Windows desktop application with **Glassmorphism**, **Light and Dark Mode**, a **minimal C++ backend (Winsock2 + SQLite3)**, **normal SQL**, and **Windows Internal Storage (`%APPDATA%`)**.
 
-> **Note**: This project does NOT use Node.js or npm. It is a completely self-contained native C++ and modern HTML5/CSS3/JavaScript application.
+> **Direct Download**: Download the standalone single executable [**`ApplyTrack.exe`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.exe) directly from the GitHub Release! No installer, no zip extraction, no DLLs, and zero Node.js needed.
 
 ---
 
 ## 💎 Features & Capabilities
 
+- **Direct Single Executable (`ApplyTrack.exe`)**:
+  - 100% standalone portable binary with zero external dependencies.
+  - Statically linked C++ runtime and embedded SQLite3 engine.
+  - All web assets (HTML5, CSS3, JavaScript, icons, branding banners) are embedded directly inside the `.exe`.
 - **100% Native & Zero Node.js**:
   - No `node_modules`, no npm, no JavaScript runtime overhead.
-  - Native Windows executable (`jobtracker_backend.exe`) compiled with `g++` and embedded icon resource.
+  - Minimal memory footprint (< 15 MB RAM).
 - **Glassmorphic Light & Dark Mode**:
   - **Dark Mode**: Deep atmospheric obsidian glass, glowing teal and orange accents, frosted panels.
   - **Light Mode**: Frosted ice glassmorphism with crisp high-contrast text and translucent white panels.
@@ -25,6 +29,25 @@ A fast, lightweight, and 100% native Windows desktop application with **Glassmor
   - Starts 100% clean and pristine. Zero mock records.
 - **Custom Application Icon & Brand**:
   - Custom icon extracted from user logo (clipboard, checklist, and magnifying growth arrow) embedded into the `.exe` binary.
+
+---
+
+## 🚀 How to Run
+
+### Direct Standalone Binary (Recommended)
+1. Download [**`ApplyTrack.exe`**](https://github.com/amara-narayana/apply-track/releases/download/v1.0.0/ApplyTrack.exe).
+2. Double-click `ApplyTrack.exe` anywhere on your computer.
+3. The app will launch immediately with full glassmorphism UI connected to your internal SQLite database!
+
+### Build from Source
+```powershell
+# 1. Embed renderer assets (optional, header included in repo)
+python scripts/embed_assets.py
+
+# 2. Compile Windows resource & executable
+windres -I . -i src/app_icon.rc -O coff -o src/app_icon.res
+g++ -O3 -I src -static -static-libgcc -static-libstdc++ src/backend.cpp src/app_icon.res -lsqlite3 -lws2_32 -o ApplyTrack.exe
+```
 
 ---
 

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <ctime>
+#include "embedded_assets.h"
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "sqlite3.lib")
@@ -421,6 +422,16 @@ long getFileSize(const string& filename) {
     return (long)size.QuadPart;
 }
 
+// Reliable socket send all bytes
+void sendAll(SOCKET sock, const char* data, int total) {
+    int sent = 0;
+    while (sent < total) {
+        int n = send(sock, data + sent, total - sent, 0);
+        if (n <= 0) break;
+        sent += n;
+    }
+}
+
 // Minimal HTTP Server using Winsock
 void runHttpServer() {
     WSADATA wsa;
@@ -463,10 +474,15 @@ void runHttpServer() {
         return;
     }
 
+    SetConsoleTitleA("APPLY TRACK - Native Windows Job Application Tracker");
     cout << "==========================================================" << endl;
-    cout << "  JobTrack Minimal C++ Backend & Glassmorphic Server" << endl;
-    cout << "  Listening on: http://127.0.0.1:" << g_port << endl;
-    cout << "  SQLite Database: " << g_dbPath << endl;
+    cout << "  APPLY TRACK v1.0.0 - Native Windows Desktop App" << endl;
+    cout << "  Server:   http://127.0.0.1:" << g_port << endl;
+    cout << "  Storage:  " << g_dbPath << endl;
+    cout << "==========================================================" << endl;
+    cout << "  [OK] Launched application window." << endl;
+    cout << "  [OK] Zero Node.js runtime / Embedded SQLite internal vault." << endl;
+    cout << "  [TIP] Keep this console open, or press Ctrl+C to exit." << endl;
     cout << "==========================================================" << endl;
 
     // Launch Edge App mode window or default browser
@@ -522,22 +538,28 @@ void runHttpServer() {
             if (method == "OPTIONS") {
                 responseBody = "";
             } else if (method == "GET" && (uri == "/" || uri == "/index.html")) {
-                responseBody = readFileContent("src/renderer/index.html");
+                string disk = readFileContent("src/renderer/index.html");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_INDEX_HTML_DATA, ASSET_INDEX_HTML_LEN);
                 contentType = "text/html; charset=utf-8";
             } else if (method == "GET" && uri == "/styles.css") {
-                responseBody = readFileContent("src/renderer/styles.css");
+                string disk = readFileContent("src/renderer/styles.css");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_STYLES_CSS_DATA, ASSET_STYLES_CSS_LEN);
                 contentType = "text/css; charset=utf-8";
             } else if (method == "GET" && uri == "/app.js") {
-                responseBody = readFileContent("src/renderer/app.js");
+                string disk = readFileContent("src/renderer/app.js");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_APP_JS_DATA, ASSET_APP_JS_LEN);
                 contentType = "application/javascript; charset=utf-8";
             } else if (method == "GET" && uri == "/icons.js") {
-                responseBody = readFileContent("src/renderer/icons.js");
+                string disk = readFileContent("src/renderer/icons.js");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_ICONS_JS_DATA, ASSET_ICONS_JS_LEN);
                 contentType = "application/javascript; charset=utf-8";
             } else if (method == "GET" && uri == "/app_icon.png") {
-                responseBody = readFileContent("src/renderer/app_icon.png");
+                string disk = readFileContent("src/renderer/app_icon.png");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_APP_ICON_PNG_DATA, ASSET_APP_ICON_PNG_LEN);
                 contentType = "image/png";
             } else if (method == "GET" && uri == "/apply_track_banner.png") {
-                responseBody = readFileContent("src/renderer/apply_track_banner.png");
+                string disk = readFileContent("src/renderer/apply_track_banner.png");
+                responseBody = !disk.empty() ? disk : string((const char*)ASSET_BANNER_PNG_DATA, ASSET_BANNER_PNG_LEN);
                 contentType = "image/png";
             } else if (method == "GET" && uri == "/api/applications") {
                 responseBody = getApplicationsJson();
@@ -578,6 +600,19 @@ void runHttpServer() {
                 sqlite3_exec(db, "DELETE FROM applications; DELETE FROM activity_log; VACUUM;", nullptr, nullptr, nullptr);
                 responseBody = "{\"success\":true}";
                 contentType = "application/json";
+            } else if (method == "POST" && uri == "/api/exit") {
+                responseBody = "{\"success\":true,\"message\":\"Application shutting down\"}";
+                contentType = "application/json";
+                responseHeader += "Content-Type: " + contentType + "\r\n";
+                responseHeader += "Content-Length: " + to_string(responseBody.size()) + "\r\n\r\n";
+                sendAll(clientSock, responseHeader.data(), (int)responseHeader.size());
+                sendAll(clientSock, responseBody.data(), (int)responseBody.size());
+                shutdown(clientSock, SD_BOTH);
+                closesocket(clientSock);
+                closesocket(serverSock);
+                WSACleanup();
+                if (db) sqlite3_close(db);
+                exit(0);
             } else {
                 responseHeader = "HTTP/1.1 404 Not Found\r\n";
                 responseBody = "Not found";
@@ -586,9 +621,9 @@ void runHttpServer() {
             responseHeader += "Content-Type: " + contentType + "\r\n";
             responseHeader += "Content-Length: " + to_string(responseBody.size()) + "\r\n\r\n";
 
-            send(clientSock, responseHeader.c_str(), (int)responseHeader.size(), 0);
+            sendAll(clientSock, responseHeader.data(), (int)responseHeader.size());
             if (!responseBody.empty()) {
-                send(clientSock, responseBody.c_str(), (int)responseBody.size(), 0);
+                sendAll(clientSock, responseBody.data(), (int)responseBody.size());
             }
             shutdown(clientSock, SD_SEND);
         }
