@@ -1,0 +1,21 @@
+# Binaries & Object files
+*.o
+*.obj
+
+# Local SQLite databases & Windows Internal Storage data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS & Editor temp files
+.vscode/
+.idea/
+Thumbs.db
+*.tmp
+*.log
+*~
+
+# Python cache (if any scripts run)
+__pycache__/
+*.pyc

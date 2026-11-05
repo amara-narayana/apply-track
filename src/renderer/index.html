@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APPLY TRACK - Glassmorphic Windows Job Tracker</title>
+  <link rel="icon" type="image/png" href="app_icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient Glow Canvas for Glassmorphism Light Refraction -->
+  <div class="ambient-glow-wrapper">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Glassmorphic Header / Titlebar -->
+  <header class="glass-titlebar">
+    <div class="titlebar-brand">
+      <img src="app_icon.png" class="brand-logo-img" alt="ApplyTrack Logo">
+      <div class="brand-name">
+        <span class="brand-name-apply">APPLY</span>
+        <span class="brand-name-track">TRACK</span>
+      </div>
+      <div class="brand-vault-badge" title="Data stored in local Windows internal SQLite database">
+        <span class="pulse-point"></span>
+        <span>Windows SQLite Vault</span>
+      </div>
+    </div>
+    
+    <div class="titlebar-controls">
+      <!-- Light / Dark Mode Toggle Button -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode">
+        <span id="theme-toggle-icon">☀️</span>
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Container -->
+  <div class="app-workspace">
+    <!-- Frosted Glass Sidebar -->
+    <aside class="glass-sidebar">
+      <div class="sidebar-nav-group">
+        <div class="nav-header-label">Workspace</div>
+        <div class="glass-nav-item active" data-view="dashboard" id="nav-dashboard">
+          <span id="icon-nav-dash"></span>
+          <span>Dashboard</span>
+        </div>
+        <div class="glass-nav-item" data-view="board" id="nav-board">
+          <span id="icon-nav-board"></span>
+          <span>Kanban Board</span>
+          <span class="nav-count-pill" id="badge-board-count">0</span>
+        </div>
+        <div class="glass-nav-item" data-view="list" id="nav-list">
+          <span id="icon-nav-list"></span>
+          <span>Applications List</span>
+          <span class="nav-count-pill" id="badge-list-count">0</span>
+        </div>
+        <div class="glass-nav-item" data-view="analytics" id="nav-analytics">
+          <span id="icon-nav-analytics"></span>
+          <span>Salary & Insights</span>
+        </div>
+        <div class="nav-header-label" style="margin-top: 14px;">Windows Storage</div>
+        <div class="glass-nav-item" data-view="storage" id="nav-storage">
+          <span id="icon-nav-storage"></span>
+          <span>SQLite Vault</span>
+        </div>
+      </div>
+
+      <!-- Sidebar Bottom: Windows SQLite Storage Box -->
+      <div class="sidebar-storage-box">
+        <div class="storage-box-head">
+          <span class="storage-box-label">
+            <span id="icon-storage-disk"></span> SQLite Internal
+          </span>
+          <button class="glass-mini-btn" id="btn-quick-explorer" title="Open in Windows File Explorer">
+            <span id="icon-quick-folder"></span>
+          </button>
+        </div>
+        <div class="storage-path-display" id="sidebar-db-path">%APPDATA%\JobApplicationTracker\jobtracker.db</div>
+      </div>
+    </aside>
+
+    <!-- Main Canvas -->
+    <main class="main-canvas">
+      <!-- Glass Action Bar -->
+      <div class="glass-action-bar">
+        <h1 class="view-headline" id="page-headline">Overview Dashboard</h1>
+        <div class="action-bar-tools">
+          <div class="glass-search-wrap">
+            <span id="icon-search-bar" style="color: var(--text-muted);"></span>
+            <input type="text" class="glass-search-input" id="global-search-input" placeholder="Search company, role, tag... (Ctrl+F)">
+          </div>
+          <button class="glass-btn glass-btn-primary" id="btn-add-application">
+            <span id="icon-plus-btn"></span>
+            <span>New Application</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: Dashboard -->
+      <section class="glass-view-body active" id="view-dashboard">
+        <!-- Rendered dynamically (Empty state or Glass KPIs) -->
+        <div id="dashboard-content-area"></div>
+      </section>
+
+      <!-- VIEW 2: Kanban Pipeline -->
+      <section class="glass-view-body" id="view-board">
+        <div id="board-content-area" style="height: 100%;">
+          <div class="glass-board-scroller" id="kanban-columns-container">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: Applications List -->
+      <section class="glass-view-body" id="view-list">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+          <!-- Filter Dropdowns -->
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select class="form-ctrl-glass" id="filter-status-select" title="Filter by Application Stage">
+              <option value="ALL">All Stages</option>
+              <option value="Wishlist">Wishlist</option>
+              <option value="Applied">Applied</option>
+              <option value="Screening">Screening / HR</option>
+              <option value="Technical Interview">Technical Interview</option>
+              <option value="Final Round">Final Round</option>
+              <option value="Offer">Offer Received</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+
+            <select class="form-ctrl-glass" id="filter-workmode-select" title="Filter by Workplace Mode">
+              <option value="ALL">All Workplace Modes</option>
+              <option value="Remote">Remote</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="On-site">On-site</option>
+            </select>
+          </div>
+
+          <!-- Sort Dropdown & CSV Export -->
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select class="form-ctrl-glass" id="sort-select" title="Sort Applications">
+              <option value="date-newest">Applied: Newest First</option>
+              <option value="date-oldest">Applied: Oldest First</option>
+              <option value="company-az">Company: A - Z</option>
+              <option value="salary-high">Salary: High - Low</option>
+              <option value="interview-soonest">Next Interview: Soonest</option>
+            </select>
+            <button class="glass-btn glass-btn-secondary" id="btn-export-csv-table">
+              <span id="icon-download-csv"></span> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-table-wrap">
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>Company & Role</th>
+                <th>Stage</th>
+                <th>Salary Target</th>
+                <th>Work Mode</th>
+                <th>Date Applied</th>
+                <th>Next Event</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body-rows">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: Analytics -->
+      <section class="glass-view-body" id="view-analytics">
+        <div id="analytics-content-area"></div>
+      </section>
+
+      <!-- VIEW 5: SQLite Internal Storage Management -->
+      <section class="glass-view-body" id="view-storage">
+        <div class="glass-metric-card" style="margin-bottom: 24px; padding: 26px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main);">Windows Internal SQLite Storage</h2>
+              <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+                Direct SQLite 3 database (`jobtracker.db`) located in your local Windows Roaming profile.
+              </p>
+            </div>
+            <button class="glass-btn glass-btn-primary" id="btn-open-explorer-storage">
+              <span id="icon-folder-storage-btn"></span> Open in Windows Explorer
+            </button>
+          </div>
+
+          <div style="background: var(--glass-input-bg); border: 1px solid var(--glass-border); padding: 12px 16px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; color: var(--brand-teal); word-break: break-all;" id="storage-full-path">
+            %APPDATA%\JobApplicationTracker\jobtracker.db
+          </div>
+        </div>
+
+        <div class="glass-metrics-grid">
+          <div class="glass-metric-card">
+            <div class="metric-card-header">
+              <span class="metric-card-label">Database Engine</span>
+            </div>
+            <div class="metric-card-val" style="font-size: 20px; color: var(--brand-teal);">SQLite 3.53</div>
+            <span class="metric-card-sub">Normal SQL with prepared statements</span>
+          </div>
+
+          <div class="glass-metric-card">
+            <div class="metric-card-header">
+              <span class="metric-card-label">Database File Size</span>
+            </div>
+            <div class="metric-card-val" style="font-size: 22px;" id="storage-db-size">0 KB</div>
+            <span class="metric-card-sub">Local disk usage in AppData</span>
+          </div>
+
+          <div class="glass-metric-card">
+            <div class="metric-card-header">
+              <span class="metric-card-label">Total Real Records</span>
+            </div>
+            <div class="metric-card-val" style="font-size: 22px; color: #10b981;" id="storage-total-records">0</div>
+            <span class="metric-card-sub">Zero fake / synthetic records</span>
+          </div>
+        </div>
+
+        <div class="glass-metric-card" style="margin-top: 18px;">
+          <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 14px; font-weight: 700; color: var(--text-main);">Data Operations & Maintenance</span>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+            <button class="glass-btn glass-btn-secondary" id="btn-export-csv-action">Export to CSV</button>
+            <button class="glass-btn glass-btn-danger" id="btn-clear-db-action">Reset Database (Wipe All Records)</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- APPLICATION ENTRY / EDIT MODAL -->
+  <div class="glass-modal-backdrop" id="app-modal">
+    <div class="glass-modal-panel">
+      <div class="modal-header-glass">
+        <h3 class="modal-title-glass" id="modal-title-text">Add Job Application</h3>
+        <button class="glass-mini-btn" id="btn-close-modal" style="width: 28px; height: 28px;">
+          <svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor"><line x1="0" y1="0" x2="12" y2="12"/><line x1="12" y1="0" x2="0" y2="12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body-glass">
+        <input type="hidden" id="form-id">
+
+        <!-- Company & Role -->
+        <div class="form-row-2">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Company Name *</label>
+            <input type="text" class="form-ctrl-glass" id="form-company" placeholder="e.g. OpenAI, Stripe, Amazon, Startup..." required>
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Role / Job Title *</label>
+            <input type="text" class="form-ctrl-glass" id="form-role" placeholder="e.g. Senior Software Engineer" required>
+          </div>
+        </div>
+
+        <!-- Stage, Work Mode, Job Type Dropdowns -->
+        <div class="form-row-3">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Pipeline Stage</label>
+            <select class="form-ctrl-glass" id="form-status">
+              <option value="Wishlist">Wishlist</option>
+              <option value="Applied" selected>Applied</option>
+              <option value="Screening">Screening / HR</option>
+              <option value="Technical Interview">Technical Interview</option>
+              <option value="Final Round">Final Round</option>
+              <option value="Offer">Offer Received</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Workplace Mode</label>
+            <select class="form-ctrl-glass" id="form-workmode">
+              <option value="Remote" selected>Remote</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="On-site">On-site</option>
+            </select>
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Job Type</label>
+            <select class="form-ctrl-glass" id="form-jobtype">
+              <option value="Full-time" selected>Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Location & URL -->
+        <div class="form-row-2">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Location</label>
+            <input type="text" class="form-ctrl-glass" id="form-location" placeholder="e.g. Remote (US) or San Francisco, CA">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Job URL</label>
+            <input type="url" class="form-ctrl-glass" id="form-joburl" placeholder="https://...">
+          </div>
+        </div>
+
+        <!-- Compensation & Currency Dropdowns -->
+        <div class="form-row-3">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Salary Min</label>
+            <input type="number" class="form-ctrl-glass" id="form-salary-min" placeholder="e.g. 140000">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Salary Max</label>
+            <input type="number" class="form-ctrl-glass" id="form-salary-max" placeholder="e.g. 180000">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Currency & Frequency</label>
+            <div style="display: flex; gap: 6px;">
+              <select class="form-ctrl-glass" id="form-currency" style="width: 85px;">
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+                <option value="₹">₹ (INR)</option>
+                <option value="C$">C$ (CAD)</option>
+                <option value="A$">A$ (AUD)</option>
+                <option value="¥">¥ (JPY)</option>
+                <option value="CHF">CHF</option>
+              </select>
+              <select class="form-ctrl-glass" id="form-salary-period" style="flex: 1;">
+                <option value="Yearly" selected>/ Year</option>
+                <option value="Monthly">/ Month</option>
+                <option value="Hourly">/ Hour</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="form-row-3">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Date Applied</label>
+            <input type="date" class="form-ctrl-glass" id="form-date-applied">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Next Interview (Date & Time)</label>
+            <input type="text" class="form-ctrl-glass" id="form-next-interview" placeholder="YYYY-MM-DD HH:MM">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Follow-up Date</label>
+            <input type="date" class="form-ctrl-glass" id="form-followup-date">
+          </div>
+        </div>
+
+        <!-- Contact & Recruiter -->
+        <div class="form-row-3">
+          <div class="form-group-glass">
+            <label class="form-label-glass">Contact / Recruiter Name</label>
+            <input type="text" class="form-ctrl-glass" id="form-contact-name" placeholder="e.g. Sarah Jenkins">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Contact Email</label>
+            <input type="email" class="form-ctrl-glass" id="form-contact-email" placeholder="sarah@company.com">
+          </div>
+          <div class="form-group-glass">
+            <label class="form-label-glass">Phone / LinkedIn</label>
+            <input type="text" class="form-ctrl-glass" id="form-contact-phone" placeholder="Phone or LinkedIn link">
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group-glass">
+          <label class="form-label-glass">Tags (comma-separated)</label>
+          <input type="text" class="form-ctrl-glass" id="form-tags" placeholder="e.g. TypeScript, High Priority, Referral, FinTech">
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group-glass">
+          <label class="form-label-glass">Notes & Preparation</label>
+          <textarea class="form-ctrl-glass form-textarea-glass" id="form-notes" placeholder="Interview feedback, salary discussions, recruiter notes..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer-glass">
+        <button type="button" class="glass-btn glass-btn-secondary" id="btn-cancel-modal">Cancel</button>
+        <button type="button" class="glass-btn glass-btn-primary" id="btn-save-modal">Save to SQLite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="glass-toast-area" id="toast-shelf"></div>
+
+  <!-- Scripts -->
+  <script src="icons.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
