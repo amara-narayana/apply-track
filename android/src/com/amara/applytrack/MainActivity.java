@@ -18,6 +18,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -67,6 +68,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.parseColor("#060913"));
+            getWindow().setNavigationBarColor(Color.parseColor("#060913"));
+        }
+
         dbHelper = new DatabaseHelper(this);
 
         initViews();
@@ -86,6 +92,20 @@ public class MainActivity extends Activity {
 
     private void initViews() {
         rootLayout = findViewById(R.id.root_layout);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            rootLayout.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                    v.setPadding(
+                        insets.getSystemWindowInsetLeft(),
+                        insets.getSystemWindowInsetTop(),
+                        insets.getSystemWindowInsetRight(),
+                        insets.getSystemWindowInsetBottom()
+                    );
+                    return insets;
+                }
+            });
+        }
         tvAppTitle = findViewById(R.id.tv_app_title);
 
         tvMetricTotal = findViewById(R.id.tv_metric_total);
@@ -364,15 +384,18 @@ public class MainActivity extends Activity {
         for (final String stageName : STAGES) {
             List<DatabaseHelper.JobApplication> stageApps = dbHelper.queryApplications(stageName, currentSearch);
 
+            int screenWidth = getResources().getDisplayMetrics().widthPixels;
+            int colWidth = (int)(screenWidth * 0.80f);
+            if (colWidth < dpToPx(240)) colWidth = dpToPx(240);
+            if (colWidth > dpToPx(320)) colWidth = dpToPx(320);
+
             LinearLayout col = new LinearLayout(this);
             col.setOrientation(LinearLayout.VERTICAL);
-            col.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(280), ViewGroup.LayoutParams.WRAP_CONTENT));
-            col.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
-            col.setBackgroundResource(isDarkMode ? R.drawable.glass_card_dark : R.drawable.glass_card_light);
-
-            LinearLayout.LayoutParams colLp = (LinearLayout.LayoutParams) col.getLayoutParams();
+            LinearLayout.LayoutParams colLp = new LinearLayout.LayoutParams(colWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
             colLp.setMargins(0, 0, dpToPx(12), 0);
             col.setLayoutParams(colLp);
+            col.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+            col.setBackgroundResource(isDarkMode ? R.drawable.glass_card_dark : R.drawable.glass_card_light);
 
             // Column Header
             LinearLayout header = new LinearLayout(this);

@@ -3,22 +3,24 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:background="@drawable/bg_dark">
 
-    <!-- Top App Bar -->
+    <!-- Top App Bar (Compact, Responsive, No Overflow) -->
     <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
 
         <ImageView
             android:id="@+id/img_app_logo"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:src="@mipmap/ic_launcher"
             android:contentDescription="ApplyTrack Logo" />
 
@@ -27,197 +29,221 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="10dp">
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="6dp">
 
             <TextView
                 android:id="@+id/tv_app_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="APPLY TRACK"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="#ffffff"
-                android:letterSpacing="0.04" />
+                android:letterSpacing="0.03"
+                android:singleLine="true" />
 
             <TextView
                 android:id="@+id/tv_vault_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="● SQLite Vault • Offline"
-                android:textSize="11sp"
-                android:textColor="#2dd4bf" />
+                android:textSize="10sp"
+                android:textColor="#2dd4bf"
+                android:singleLine="true" />
         </LinearLayout>
 
-        <!-- Pin to Home Screen Button -->
+        <!-- Compact Add to Home Button -->
         <Button
             android:id="@+id/btn_pin_home"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="📲 Add to Home"
-            android:textSize="11sp"
-            android:textColor="#2dd4bf"
+            android:layout_width="38dp"
+            android:layout_height="34dp"
+            android:text="📲"
+            android:textSize="14sp"
             android:background="@drawable/glass_btn_secondary"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textAllCaps="false" />
+            android:padding="0dp"
+            android:gravity="center"
+            android:contentDescription="Add to Home Screen" />
 
-        <!-- Theme Toggle Button -->
+        <!-- Compact Theme Toggle Button -->
         <Button
             android:id="@+id/btn_theme_toggle"
-            android:layout_width="40dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="38dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
             android:text="☀️"
-            android:textSize="14sp"
-            android:background="@drawable/glass_btn_secondary" />
+            android:textSize="13sp"
+            android:background="@drawable/glass_btn_secondary"
+            android:padding="0dp"
+            android:gravity="center"
+            android:contentDescription="Toggle Dark/Light Theme" />
     </LinearLayout>
 
     <!-- Search Input Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp">
 
         <EditText
             android:id="@+id/et_search"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="40dp"
             android:background="@drawable/glass_input_bg"
             android:hint="🔍 Search company, role, location..."
             android:textColorHint="#94a3b8"
             android:textColor="#ffffff"
-            android:textSize="14sp"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
+            android:textSize="13sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:singleLine="true"
             android:imeOptions="actionSearch" />
     </LinearLayout>
 
-    <!-- Metrics Summary Strip -->
-    <HorizontalScrollView
+    <!-- Responsive 4-Column Metrics Bar (Fits 100% on ANY Screen Width) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="6dp">
 
+        <!-- Card 1: Total -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/glass_card_dark"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_margin="2dp"
+            android:gravity="center">
 
-            <!-- Card: Total -->
-            <LinearLayout
-                android:layout_width="105dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/glass_card_dark"
-                android:padding="10dp"
-                android:layout_marginEnd="8dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TOTAL"
-                    android:textSize="10sp"
-                    android:textColor="#94a3b8"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/tv_metric_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#ffffff" />
-            </LinearLayout>
-
-            <!-- Card: Applied -->
-            <LinearLayout
-                android:layout_width="105dp"
+                android:text="TOTAL"
+                android:textSize="9sp"
+                android:textColor="#94a3b8"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_metric_total"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/glass_card_dark"
-                android:padding="10dp"
-                android:layout_marginEnd="8dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="APPLIED"
-                    android:textSize="10sp"
-                    android:textColor="#2dd4bf"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/tv_metric_applied"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#2dd4bf" />
-            </LinearLayout>
-
-            <!-- Card: Interviews -->
-            <LinearLayout
-                android:layout_width="105dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/glass_card_dark"
-                android:padding="10dp"
-                android:layout_marginEnd="8dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="INTERVIEW"
-                    android:textSize="10sp"
-                    android:textColor="#a855f7"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/tv_metric_interviews"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#a855f7" />
-            </LinearLayout>
-
-            <!-- Card: Offers -->
-            <LinearLayout
-                android:layout_width="105dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/glass_card_dark"
-                android:padding="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="OFFERS"
-                    android:textSize="10sp"
-                    android:textColor="#10b981"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/tv_metric_offers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#10b981" />
-            </LinearLayout>
+                android:text="0"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#ffffff" />
         </LinearLayout>
-    </HorizontalScrollView>
 
-    <!-- Stage Filter Chips -->
+        <!-- Card 2: Applied -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/glass_card_dark"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_margin="2dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="APPLIED"
+                android:textSize="9sp"
+                android:textColor="#2dd4bf"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_metric_applied"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#2dd4bf" />
+        </LinearLayout>
+
+        <!-- Card 3: Interviews -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/glass_card_dark"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_margin="2dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="INTERVIEW"
+                android:textSize="9sp"
+                android:textColor="#a855f7"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_metric_interviews"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#a855f7" />
+        </LinearLayout>
+
+        <!-- Card 4: Offers -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/glass_card_dark"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_margin="2dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OFFERS"
+                android:textSize="9sp"
+                android:textColor="#10b981"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_metric_offers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#10b981" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Stage Filter Chips Strip -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="10dp">
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:id="@+id/ll_filter_chips"
@@ -228,78 +254,78 @@
             <Button
                 android:id="@+id/chip_all"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="All"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#0a0f1d"
                 android:background="@drawable/chip_active"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginEnd="6dp"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/chip_applied"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="Applied"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#ffffff"
                 android:background="@drawable/chip_inactive"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginEnd="6dp"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/chip_screening"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="Screening"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#ffffff"
                 android:background="@drawable/chip_inactive"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginEnd="6dp"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/chip_interview"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="Interview"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#ffffff"
                 android:background="@drawable/chip_inactive"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginEnd="6dp"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/chip_offer"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="Offer"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#ffffff"
                 android:background="@drawable/chip_inactive"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginEnd="6dp"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/chip_rejected"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="30dp"
                 android:text="Rejected"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#ffffff"
                 android:background="@drawable/chip_inactive"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textAllCaps="false" />
         </LinearLayout>
     </HorizontalScrollView>
@@ -307,11 +333,9 @@
     <!-- Navigation Tabs Strip -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="36dp"
         android:orientation="horizontal"
-        android:background="#151e2e"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:background="#151e2e">
 
         <TextView
             android:id="@+id/tab_applications"
@@ -322,7 +346,7 @@
             android:text="Applications"
             android:textColor="#2dd4bf"
             android:textStyle="bold"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tab_kanban"
@@ -330,9 +354,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Kanban Board"
+            android:text="Kanban"
             android:textColor="#94a3b8"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tab_vault"
@@ -340,12 +364,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="SQLite Vault"
+            android:text="Vault"
             android:textColor="#94a3b8"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
-    <!-- Main Content Container -->
+    <!-- Main Content Container (Expands flexibly to fill available vertical space) -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -363,23 +387,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="12dp">
 
                 <!-- Empty state placeholder -->
                 <LinearLayout
                     android:id="@+id/ll_empty_state"
                     android:layout_width="match_parent"
-                    android:layout_height="240dp"
+                    android:layout_height="200dp"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/glass_card_dark"
-                    android:padding="24dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="💼"
-                        android:textSize="44sp" />
+                        android:textSize="36sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -387,15 +411,15 @@
                         android:text="Zero Applications Recorded"
                         android:textColor="#ffffff"
                         android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="8dp" />
+                        android:textSize="15sp"
+                        android:layout_marginTop="6dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No fake or synthetic data. Tap '+ New Application' below to track your first job."
+                        android:text="No fake data. Tap '+ New Application' below to track your first job."
                         android:textColor="#94a3b8"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:gravity="center"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -427,7 +451,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="16dp" />
+                    android:padding="12dp" />
             </HorizontalScrollView>
         </ScrollView>
 
@@ -443,15 +467,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/glass_card_dark"
-                    android:padding="18dp"
-                    android:layout_marginBottom="16dp">
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -459,7 +483,7 @@
                         android:text="Android Internal SQLite Storage"
                         android:textColor="#ffffff"
                         android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/tv_vault_full_path"
@@ -467,9 +491,9 @@
                         android:layout_height="wrap_content"
                         android:text="/data/data/com.amara.applytrack/databases/jobtracker.db"
                         android:textColor="#2dd4bf"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:background="@drawable/glass_input_bg"
-                        android:padding="10dp"
+                        android:padding="8dp"
                         android:layout_marginTop="8dp" />
 
                     <TextView
@@ -478,13 +502,13 @@
                         android:layout_height="wrap_content"
                         android:text="Database Size: 12.0 KB"
                         android:textColor="#94a3b8"
-                        android:textSize="13sp"
-                        android:layout_marginTop="10dp" />
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SQLite 3.x with Android SQLiteOpenHelper. Zero internet permissions required."
+                        android:text="SQLite 3.x with Android SQLiteOpenHelper. Fully offline."
                         android:textColor="#64748b"
                         android:textSize="11sp"
                         android:layout_marginTop="4dp" />
@@ -496,7 +520,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/glass_card_dark"
-                    android:padding="18dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -504,49 +528,53 @@
                         android:text="Data Export &amp; Sharing"
                         android:textColor="#ffffff"
                         android:textStyle="bold"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="14sp"
+                        android:layout_marginBottom="10dp" />
 
                     <Button
                         android:id="@+id/btn_export_csv"
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="Export &amp; Share CSV (Gmail, Drive, WhatsApp)"
+                        android:layout_height="42dp"
+                        android:text="Export &amp; Share CSV"
                         android:textColor="#0a0f1d"
                         android:background="@drawable/glass_btn_primary"
                         android:textStyle="bold"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textAllCaps="false"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <Button
                         android:id="@+id/btn_clear_db"
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
+                        android:layout_height="42dp"
                         android:text="Reset Database (Delete All Records)"
                         android:textColor="#f43f5e"
                         android:background="@drawable/glass_btn_secondary"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textAllCaps="false" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
     </FrameLayout>
 
-    <!-- Bottom Action Bar / Add Application Button -->
+    <!-- Bottom Action Bar (Fixed, cleanly padded above system navigation bar) -->
     <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:background="#0d1424">
 
         <Button
             android:id="@+id/btn_new_app"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:text="+ New Application"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#0a0f1d"
             android:background="@drawable/glass_btn_primary"

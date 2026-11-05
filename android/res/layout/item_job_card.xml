@@ -4,8 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/glass_card_dark"
-    android:padding="16dp"
-    android:layout_marginBottom="12dp">
+    android:padding="12dp"
+    android:layout_marginBottom="10dp">
 
     <!-- Top Row: Role, Company & Status Pill -->
     <LinearLayout
