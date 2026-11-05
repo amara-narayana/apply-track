@@ -1080,3 +1080,77 @@ select.form-ctrl-glass option:checked {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* ==========================================================================
+   Responsive Adaptations - Perfectly fits any screen size & resolution
+   ========================================================================== */
+@media (max-width: 960px) {
+  .app-workspace {
+    flex-direction: column;
+  }
+  .glass-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px 16px;
+  }
+  .sidebar-nav-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .nav-header-label {
+    display: none;
+  }
+  .sidebar-storage-box {
+    display: none;
+  }
+  .glass-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .glass-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .action-bar-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .glass-search-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .glass-titlebar {
+    padding: 8px 12px;
+  }
+  .brand-vault-badge {
+    display: none;
+  }
+  .glass-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row-2,
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+  .glass-modal-panel {
+    width: 95%;
+    max-height: 90vh;
+  }
+  .glass-toast-area {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+

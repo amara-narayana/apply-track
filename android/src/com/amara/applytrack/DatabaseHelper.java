@@ -6,12 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -19,6 +18,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "jobtracker.db";
     private static final int DATABASE_VERSION = 1;
     private final Context context;
+
+    public static class JobApplication {
+        public String id = "";
+        public String company = "";
+        public String role = "";
+        public String status = "Applied";
+        public String workMode = "Remote";
+        public String jobType = "Full-time";
+        public String location = "";
+        public String jobUrl = "";
+        public double salaryMin = 0;
+        public double salaryMax = 0;
+        public String currency = "$";
+        public String salaryPeriod = "Yearly";
+        public String dateApplied = "";
+        public String nextInterview = "";
+        public String followUpDate = "";
+        public String contactName = "";
+        public String contactEmail = "";
+        public String contactPhone = "";
+        public String notes = "";
+        public String tags = "";
+        public String createdAt = "";
+        public String updatedAt = "";
+    }
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,7 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Migration if needed
+        // Upgrade migrations if needed
     }
 
     private String getCurrentDateTime() {
@@ -75,128 +99,156 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void logActivity(String type, String message, String appId) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("action_type", type);
-        cv.put("message", message);
-        cv.put("application_id", appId != null ? appId : "");
-        cv.put("created_at", getCurrentDateTime());
-        db.insert("activity_log", null, cv);
-    }
-
-    public String getApplicationsJson() {
-        JSONArray arr = new JSONArray();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT id, company, role, status, work_mode, job_type, location, job_url, salary_min, salary_max, currency, salary_period, date_applied, next_interview, follow_up_date, contact_name, contact_email, contact_phone, notes, tags, created_at, updated_at FROM applications ORDER BY date_applied DESC, created_at DESC", null);
         try {
-            while (c.moveToNext()) {
-                JSONObject obj = new JSONObject();
-                obj.put("id", c.getString(0));
-                obj.put("company", c.getString(1));
-                obj.put("role", c.getString(2));
-                obj.put("status", c.getString(3));
-                obj.put("work_mode", c.getString(4));
-                obj.put("job_type", c.getString(5));
-                obj.put("location", c.getString(6));
-                obj.put("job_url", c.getString(7));
-                obj.put("salary_min", c.getDouble(8));
-                obj.put("salary_max", c.getDouble(9));
-                obj.put("currency", c.getString(10));
-                obj.put("salary_period", c.getString(11));
-                obj.put("date_applied", c.getString(12));
-                obj.put("next_interview", c.getString(13));
-                obj.put("follow_up_date", c.getString(14));
-                obj.put("contact_name", c.getString(15));
-                obj.put("contact_email", c.getString(16));
-                obj.put("contact_phone", c.getString(17));
-                obj.put("notes", c.getString(18));
-                obj.put("tags", c.getString(19));
-                obj.put("created_at", c.getString(20));
-                obj.put("updated_at", c.getString(21));
-                arr.put(obj);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            c.close();
-        }
-        return arr.toString();
-    }
-
-    public String getActivityJson() {
-        JSONArray arr = new JSONArray();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT id, action_type, message, application_id, created_at FROM activity_log ORDER BY id DESC LIMIT 25", null);
-        try {
-            while (c.moveToNext()) {
-                JSONObject obj = new JSONObject();
-                obj.put("id", c.getInt(0));
-                obj.put("action_type", c.getString(1));
-                obj.put("message", c.getString(2));
-                obj.put("application_id", c.getString(3));
-                obj.put("created_at", c.getString(4));
-                arr.put(obj);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            c.close();
-        }
-        return arr.toString();
-    }
-
-    public String saveApplication(String payload) {
-        try {
-            JSONObject obj = new JSONObject(payload);
-            String id = obj.optString("id", "").trim();
-            boolean isNew = id.isEmpty();
-            if (isNew) {
-                id = "app_" + (System.currentTimeMillis() / 1000) + "_" + (int)(Math.random() * 9000 + 1000);
-            }
-
             SQLiteDatabase db = getWritableDatabase();
             ContentValues cv = new ContentValues();
-            cv.put("company", obj.optString("company", ""));
-            cv.put("role", obj.optString("role", ""));
-            cv.put("status", obj.optString("status", "Applied"));
-            cv.put("work_mode", obj.optString("work_mode", "Remote"));
-            cv.put("job_type", obj.optString("job_type", "Full-time"));
-            cv.put("location", obj.optString("location", ""));
-            cv.put("job_url", obj.optString("job_url", ""));
-            cv.put("salary_min", obj.optDouble("salary_min", 0));
-            cv.put("salary_max", obj.optDouble("salary_max", 0));
-            cv.put("currency", obj.optString("currency", "$"));
-            cv.put("salary_period", obj.optString("salary_period", "Yearly"));
-            cv.put("date_applied", obj.optString("date_applied", ""));
-            cv.put("next_interview", obj.optString("next_interview", ""));
-            cv.put("follow_up_date", obj.optString("follow_up_date", ""));
-            cv.put("contact_name", obj.optString("contact_name", ""));
-            cv.put("contact_email", obj.optString("contact_email", ""));
-            cv.put("contact_phone", obj.optString("contact_phone", ""));
-            cv.put("notes", obj.optString("notes", ""));
-            cv.put("tags", obj.optString("tags", ""));
+            cv.put("action_type", type);
+            cv.put("message", message);
+            cv.put("application_id", appId != null ? appId : "");
+            cv.put("created_at", getCurrentDateTime());
+            db.insert("activity_log", null, cv);
+        } catch (Exception ignored) {}
+    }
+
+    public List<JobApplication> queryApplications(String filterStatus, String searchKeyword) {
+        List<JobApplication> list = new ArrayList<JobApplication>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        StringBuilder sql = new StringBuilder("SELECT id, company, role, status, work_mode, job_type, location, job_url, salary_min, salary_max, currency, salary_period, date_applied, next_interview, follow_up_date, contact_name, contact_email, contact_phone, notes, tags, created_at, updated_at FROM applications WHERE 1=1 ");
+        List<String> args = new ArrayList<String>();
+
+        if (filterStatus != null && !filterStatus.equalsIgnoreCase("ALL") && !filterStatus.isEmpty()) {
+            sql.append(" AND status = ? ");
+            args.add(filterStatus);
+        }
+
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            String kw = "%" + searchKeyword.trim().toLowerCase(Locale.ROOT) + "%";
+            sql.append(" AND (LOWER(company) LIKE ? OR LOWER(role) LIKE ? OR LOWER(location) LIKE ? OR LOWER(tags) LIKE ? OR LOWER(notes) LIKE ?) ");
+            args.add(kw);
+            args.add(kw);
+            args.add(kw);
+            args.add(kw);
+            args.add(kw);
+        }
+
+        sql.append(" ORDER BY date_applied DESC, created_at DESC ");
+
+        Cursor c = db.rawQuery(sql.toString(), args.toArray(new String[0]));
+        try {
+            while (c.moveToNext()) {
+                JobApplication app = new JobApplication();
+                app.id = c.getString(0);
+                app.company = c.getString(1);
+                app.role = c.getString(2);
+                app.status = c.getString(3);
+                app.workMode = c.getString(4);
+                app.jobType = c.getString(5);
+                app.location = c.getString(6);
+                app.jobUrl = c.getString(7);
+                app.salaryMin = c.getDouble(8);
+                app.salaryMax = c.getDouble(9);
+                app.currency = c.getString(10);
+                app.salaryPeriod = c.getString(11);
+                app.dateApplied = c.getString(12);
+                app.nextInterview = c.getString(13);
+                app.followUpDate = c.getString(14);
+                app.contactName = c.getString(15);
+                app.contactEmail = c.getString(16);
+                app.contactPhone = c.getString(17);
+                app.notes = c.getString(18);
+                app.tags = c.getString(19);
+                app.createdAt = c.getString(20);
+                app.updatedAt = c.getString(21);
+                list.add(app);
+            }
+        } finally {
+            c.close();
+        }
+        return list;
+    }
+
+    public JobApplication getApplication(String id) {
+        if (id == null || id.isEmpty()) return null;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT id, company, role, status, work_mode, job_type, location, job_url, salary_min, salary_max, currency, salary_period, date_applied, next_interview, follow_up_date, contact_name, contact_email, contact_phone, notes, tags, created_at, updated_at FROM applications WHERE id = ?", new String[]{ id });
+        try {
+            if (c.moveToFirst()) {
+                JobApplication app = new JobApplication();
+                app.id = c.getString(0);
+                app.company = c.getString(1);
+                app.role = c.getString(2);
+                app.status = c.getString(3);
+                app.workMode = c.getString(4);
+                app.jobType = c.getString(5);
+                app.location = c.getString(6);
+                app.jobUrl = c.getString(7);
+                app.salaryMin = c.getDouble(8);
+                app.salaryMax = c.getDouble(9);
+                app.currency = c.getString(10);
+                app.salaryPeriod = c.getString(11);
+                app.dateApplied = c.getString(12);
+                app.nextInterview = c.getString(13);
+                app.followUpDate = c.getString(14);
+                app.contactName = c.getString(15);
+                app.contactEmail = c.getString(16);
+                app.contactPhone = c.getString(17);
+                app.notes = c.getString(18);
+                app.tags = c.getString(19);
+                app.createdAt = c.getString(20);
+                app.updatedAt = c.getString(21);
+                return app;
+            }
+        } finally {
+            c.close();
+        }
+        return null;
+    }
+
+    public boolean saveJobApplication(JobApplication app) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("company", app.company != null ? app.company : "");
+            cv.put("role", app.role != null ? app.role : "");
+            cv.put("status", app.status != null ? app.status : "Applied");
+            cv.put("work_mode", app.workMode != null ? app.workMode : "Remote");
+            cv.put("job_type", app.jobType != null ? app.jobType : "Full-time");
+            cv.put("location", app.location != null ? app.location : "");
+            cv.put("job_url", app.jobUrl != null ? app.jobUrl : "");
+            cv.put("salary_min", app.salaryMin);
+            cv.put("salary_max", app.salaryMax);
+            cv.put("currency", app.currency != null ? app.currency : "$");
+            cv.put("salary_period", app.salaryPeriod != null ? app.salaryPeriod : "Yearly");
+            cv.put("date_applied", app.dateApplied != null ? app.dateApplied : "");
+            cv.put("next_interview", app.nextInterview != null ? app.nextInterview : "");
+            cv.put("follow_up_date", app.followUpDate != null ? app.followUpDate : "");
+            cv.put("contact_name", app.contactName != null ? app.contactName : "");
+            cv.put("contact_email", app.contactEmail != null ? app.contactEmail : "");
+            cv.put("contact_phone", app.contactPhone != null ? app.contactPhone : "");
+            cv.put("notes", app.notes != null ? app.notes : "");
+            cv.put("tags", app.tags != null ? app.tags : "");
             cv.put("updated_at", getCurrentDateTime());
 
+            boolean isNew = (app.id == null || app.id.trim().isEmpty());
             if (isNew) {
-                cv.put("id", id);
+                app.id = "app_" + (System.currentTimeMillis() / 1000) + "_" + (int)(Math.random() * 9000 + 1000);
+                cv.put("id", app.id);
                 cv.put("created_at", getCurrentDateTime());
                 db.insert("applications", null, cv);
-                logActivity("CREATED", "Added application for " + obj.optString("role") + " at " + obj.optString("company"), id);
+                logActivity("CREATED", "Added application for " + app.role + " at " + app.company, app.id);
             } else {
-                db.update("applications", cv, "id = ?", new String[]{ id });
-                logActivity("UPDATED", "Updated application details for " + obj.optString("company"), id);
+                db.update("applications", cv, "id = ?", new String[]{ app.id });
+                logActivity("UPDATED", "Updated application details for " + app.company, app.id);
             }
-
-            JSONObject res = new JSONObject();
-            res.put("success", true);
-            res.put("id", id);
-            return res.toString();
+            return true;
         } catch (Exception e) {
-            return "{\"success\":false,\"error\":\"" + e.getMessage() + "\"}";
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public String updateStage(String id, String newStage) {
+    public boolean updateJobStage(String id, String newStage) {
         try {
             SQLiteDatabase db = getWritableDatabase();
             ContentValues cv = new ContentValues();
@@ -204,32 +256,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("updated_at", getCurrentDateTime());
             db.update("applications", cv, "id = ?", new String[]{ id });
             logActivity("STAGE_CHANGE", "Moved application to " + newStage, id);
-            return "{\"success\":true}";
+            return true;
         } catch (Exception e) {
-            return "{\"success\":false,\"error\":\"" + e.getMessage() + "\"}";
+            return false;
         }
     }
 
-    public String deleteApplication(String id) {
+    public boolean deleteJobApplication(String id) {
         try {
             SQLiteDatabase db = getWritableDatabase();
             db.delete("applications", "id = ?", new String[]{ id });
             logActivity("DELETED", "Deleted application " + id, id);
-            return "{\"success\":true}";
+            return true;
         } catch (Exception e) {
-            return "{\"success\":false,\"error\":\"" + e.getMessage() + "\"}";
+            return false;
         }
     }
 
-    public String clearData() {
+    public void resetDatabase() {
         try {
             SQLiteDatabase db = getWritableDatabase();
             db.execSQL("DELETE FROM applications");
             db.execSQL("DELETE FROM activity_log");
-            return "{\"success\":true}";
-        } catch (Exception e) {
-            return "{\"success\":false,\"error\":\"" + e.getMessage() + "\"}";
+        } catch (Exception ignored) {}
+    }
+
+    public int[] getMetricsCounts() {
+        int total = 0, applied = 0, interview = 0, offer = 0;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT status, count(*) FROM applications GROUP BY status", null);
+        try {
+            while (c.moveToNext()) {
+                String st = c.getString(0);
+                int count = c.getInt(1);
+                total += count;
+                if ("Applied".equalsIgnoreCase(st)) applied += count;
+                else if (st != null && st.toLowerCase(Locale.ROOT).contains("interview")) interview += count;
+                else if ("Offer".equalsIgnoreCase(st)) offer += count;
+            }
+        } finally {
+            c.close();
         }
+        return new int[]{ total, applied, interview, offer };
     }
 
     public String exportCsv() {
@@ -254,19 +322,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return csv.toString();
     }
 
-    public String getStorageInfoJson() {
-        try {
-            File dbFile = context.getDatabasePath(DATABASE_NAME);
-            long size = dbFile.exists() ? dbFile.length() : 0;
-            JSONObject obj = new JSONObject();
-            obj.put("storageDir", dbFile.getParent());
-            obj.put("dbPath", dbFile.getAbsolutePath());
-            obj.put("dbSize", size);
-            obj.put("defaultDir", dbFile.getParent());
-            obj.put("isCustom", false);
-            return obj.toString();
-        } catch (Exception e) {
-            return "{\"storageDir\":\"\",\"dbPath\":\"\",\"dbSize\":0}";
-        }
+    public String getDbPath() {
+        return context.getDatabasePath(DATABASE_NAME).getAbsolutePath();
+    }
+
+    public long getDbFileSize() {
+        File file = context.getDatabasePath(DATABASE_NAME);
+        return file.exists() ? file.length() : 0;
     }
 }

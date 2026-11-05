@@ -13,15 +13,97 @@ public final class R {
     public static final int primary=0x7f010001;
     public static final int primary_dark=0x7f010002;
   }
+  public static final class drawable {
+    public static final int bg_dark=0x7f020000;
+    public static final int bg_light=0x7f020001;
+    public static final int chip_active=0x7f020002;
+    public static final int chip_inactive=0x7f020003;
+    public static final int glass_btn_primary=0x7f020004;
+    public static final int glass_btn_secondary=0x7f020005;
+    public static final int glass_card_dark=0x7f020006;
+    public static final int glass_card_light=0x7f020007;
+    public static final int glass_input_bg=0x7f020008;
+    public static final int pill_status_applied=0x7f020009;
+    public static final int pill_status_interview=0x7f02000a;
+    public static final int pill_status_offer=0x7f02000b;
+    public static final int pill_status_rejected=0x7f02000c;
+    public static final int pill_status_screening=0x7f02000d;
+    public static final int pill_status_wishlist=0x7f02000e;
+  }
+  public static final class id {
+    public static final int btn_card_delete=0x7f030000;
+    public static final int btn_card_edit=0x7f030001;
+    public static final int btn_card_stage=0x7f030002;
+    public static final int btn_clear_db=0x7f030003;
+    public static final int btn_export_csv=0x7f030004;
+    public static final int btn_new_app=0x7f030005;
+    public static final int btn_pin_home=0x7f030006;
+    public static final int btn_theme_toggle=0x7f030007;
+    public static final int chip_all=0x7f030008;
+    public static final int chip_applied=0x7f030009;
+    public static final int chip_interview=0x7f03000a;
+    public static final int chip_offer=0x7f03000b;
+    public static final int chip_rejected=0x7f03000c;
+    public static final int chip_screening=0x7f03000d;
+    public static final int dialog_btn_cancel=0x7f03000e;
+    public static final int dialog_btn_save=0x7f03000f;
+    public static final int dialog_et_company=0x7f030010;
+    public static final int dialog_et_date_applied=0x7f030011;
+    public static final int dialog_et_joburl=0x7f030012;
+    public static final int dialog_et_location=0x7f030013;
+    public static final int dialog_et_next_interview=0x7f030014;
+    public static final int dialog_et_notes=0x7f030015;
+    public static final int dialog_et_role=0x7f030016;
+    public static final int dialog_et_salary_max=0x7f030017;
+    public static final int dialog_et_salary_min=0x7f030018;
+    public static final int dialog_sp_jobtype=0x7f030019;
+    public static final int dialog_sp_stage=0x7f03001a;
+    public static final int dialog_sp_workmode=0x7f03001b;
+    public static final int et_search=0x7f03001c;
+    public static final int img_app_logo=0x7f03001d;
+    public static final int ll_applications_container=0x7f03001e;
+    public static final int ll_card_list=0x7f03001f;
+    public static final int ll_empty_state=0x7f030020;
+    public static final int ll_filter_chips=0x7f030021;
+    public static final int ll_kanban_columns=0x7f030022;
+    public static final int root_layout=0x7f030023;
+    public static final int tab_applications=0x7f030024;
+    public static final int tab_kanban=0x7f030025;
+    public static final int tab_vault=0x7f030026;
+    public static final int tv_app_title=0x7f030027;
+    public static final int tv_card_company=0x7f030028;
+    public static final int tv_card_date_applied=0x7f030029;
+    public static final int tv_card_meta=0x7f03002a;
+    public static final int tv_card_next_interview=0x7f03002b;
+    public static final int tv_card_role=0x7f03002c;
+    public static final int tv_card_salary=0x7f03002d;
+    public static final int tv_card_status=0x7f03002e;
+    public static final int tv_dialog_title=0x7f03002f;
+    public static final int tv_metric_applied=0x7f030030;
+    public static final int tv_metric_interviews=0x7f030031;
+    public static final int tv_metric_offers=0x7f030032;
+    public static final int tv_metric_total=0x7f030033;
+    public static final int tv_vault_db_size=0x7f030034;
+    public static final int tv_vault_full_path=0x7f030035;
+    public static final int tv_vault_status=0x7f030036;
+    public static final int view_applications=0x7f030037;
+    public static final int view_kanban=0x7f030038;
+    public static final int view_vault=0x7f030039;
+  }
+  public static final class layout {
+    public static final int activity_main=0x7f040000;
+    public static final int dialog_job_form=0x7f040001;
+    public static final int item_job_card=0x7f040002;
+  }
   public static final class mipmap {
-    public static final int ic_launcher=0x7f020000;
+    public static final int ic_launcher=0x7f050000;
   }
   public static final class string {
-    public static final int app_name=0x7f030000;
-    public static final int shortcut_long_label=0x7f030001;
-    public static final int shortcut_short_label=0x7f030002;
+    public static final int app_name=0x7f060000;
+    public static final int shortcut_long_label=0x7f060001;
+    public static final int shortcut_short_label=0x7f060002;
   }
   public static final class style {
-    public static final int AppTheme=0x7f040000;
+    public static final int AppTheme=0x7f070000;
   }
 }

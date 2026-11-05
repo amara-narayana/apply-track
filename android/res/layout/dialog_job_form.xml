@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#0a0f1d"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Job Application"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Company Name -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Company Name *"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/dialog_et_company"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_input_bg"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:hint="e.g. OpenAI, Stripe, Google"
+            android:textColorHint="#475569"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Role / Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Role / Job Title *"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/dialog_et_role"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_input_bg"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:hint="e.g. Senior Software Engineer"
+            android:textColorHint="#475569"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Pipeline Stage -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pipeline Stage"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <Spinner
+            android:id="@+id/dialog_sp_stage"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_input_bg"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Workplace Mode & Job Type -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workplace Mode"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <Spinner
+                    android:id="@+id/dialog_sp_workmode"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Job Type"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <Spinner
+                    android:id="@+id/dialog_sp_jobtype"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Location & Job URL -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/dialog_et_location"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_input_bg"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:hint="e.g. Remote or San Francisco, CA"
+            android:textColorHint="#475569"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Job Listing URL"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/dialog_et_joburl"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_input_bg"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:hint="https://careers.company.com/job/..."
+            android:textColorHint="#475569"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Compensation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Salary Min ($)"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <EditText
+                    android:id="@+id/dialog_et_salary_min"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg"
+                    android:textColor="#ffffff"
+                    android:inputType="numberDecimal"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:hint="130000"
+                    android:textColorHint="#475569" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Salary Max ($)"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <EditText
+                    android:id="@+id/dialog_et_salary_max"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg"
+                    android:textColor="#ffffff"
+                    android:inputType="numberDecimal"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:hint="170000"
+                    android:textColorHint="#475569" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Dates -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date Applied"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <EditText
+                    android:id="@+id/dialog_et_date_applied"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:hint="YYYY-MM-DD"
+                    android:textColorHint="#475569" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Next Interview"
+                    android:textColor="#94a3b8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+                <EditText
+                    android:id="@+id/dialog_et_next_interview"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_input_bg"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:hint="Date / Time"
+                    android:textColorHint="#475569" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Notes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notes &amp; Referral Contact"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+        <EditText
+            android:id="@+id/dialog_et_notes"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/glass_input_bg"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:hint="Notes, recruiter contact, interview prep..."
+            android:textColorHint="#475569"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Dialog Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/dialog_btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:textColor="#94a3b8"
+                android:background="@drawable/glass_btn_secondary"
+                android:layout_marginEnd="8dp"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/dialog_btn_save"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="Save Application"
+                android:textColor="#0a0f1d"
+                android:textStyle="bold"
+                android:background="@drawable/glass_btn_primary"
+                android:layout_marginStart="8dp"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/glass_card_dark"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Top Row: Role, Company & Status Pill -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_card_role"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Senior Software Engineer"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_card_company"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Acme Technologies"
+                android:textColor="#2dd4bf"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_card_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Applied"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#2dd4bf"
+            android:background="@drawable/pill_status_applied"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp" />
+    </LinearLayout>
+
+    <!-- Details Row: Mode, Type, Location -->
+    <TextView
+        android:id="@+id/tv_card_meta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remote • Full-time • San Francisco, CA"
+        android:textColor="#94a3b8"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Salary Row -->
+    <TextView
+        android:id="@+id/tv_card_salary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$140,000 - $180,000/yr"
+        android:textColor="#10b981"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:layout_marginTop="4dp" />
+
+    <!-- Dates Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:id="@+id/tv_card_date_applied"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Applied: 2026-11-05"
+            android:textColor="#64748b"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_card_next_interview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#f59e0b"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1a334155"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Card Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_card_stage"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="Move Stage"
+            android:textSize="11sp"
+            android:textColor="#2dd4bf"
+            android:background="@drawable/glass_btn_secondary"
+            android:textAllCaps="false"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btn_card_edit"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="Edit"
+            android:textSize="11sp"
+            android:textColor="#ffffff"
+            android:background="@drawable/glass_btn_secondary"
+            android:textAllCaps="false"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btn_card_delete"
+            android:layout_width="38dp"
+            android:layout_height="34dp"
+            android:text="✕"
+            android:textSize="12sp"
+            android:textColor="#f43f5e"
+            android:background="@drawable/glass_btn_secondary" />
+    </LinearLayout>
+
+</LinearLayout>

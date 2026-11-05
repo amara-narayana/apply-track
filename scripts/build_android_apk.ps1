@@ -20,6 +20,7 @@ New-Item -ItemType Directory -Path "$buildDir\dex" -Force | Out-Null
 
 Write-Host "=== 1. Compile Android Resources (aapt2 compile) ==="
 & $aapt2 compile --dir "d:\job-tracker\android\res" -o "$buildDir\compiled_res.zip"
+if ($LASTEXITCODE -ne 0) { throw "aapt2 compile failed" }
 
 Write-Host "=== 2. Link Android Resources and generate R.java (aapt2 link) ==="
 & $aapt2 link -I $platformJar `
@@ -27,24 +28,28 @@ Write-Host "=== 2. Link Android Resources and generate R.java (aapt2 link) ==="
     -o "$buildDir\unaligned.apk" `
     --java "d:\job-tracker\android\src" `
     --auto-add-overlay `
-    "$buildDir\compiled_res.zip" `
-    -A "d:\job-tracker\android\assets"
+    "$buildDir\compiled_res.zip"
+if ($LASTEXITCODE -ne 0) { throw "aapt2 link failed" }
 
 Write-Host "=== 3. Compile Java Source Files (javac) ==="
 $javaFiles = Get-ChildItem "d:\job-tracker\android\src\com\amara\applytrack\*.java" | ForEach-Object { $_.FullName }
 & $javac -encoding UTF-8 -cp $platformJar -d "$buildDir\classes" $javaFiles
+if ($LASTEXITCODE -ne 0) { throw "javac failed" }
 
 Write-Host "=== 4. Dex bytecode (d8) ==="
 $classFiles = Get-ChildItem "$buildDir\classes\com\amara\applytrack\*.class" | ForEach-Object { $_.FullName }
 & $d8 --min-api 26 --output "$buildDir\dex" $classFiles
+if ($LASTEXITCODE -ne 0) { throw "d8 failed" }
 
 Write-Host "=== 5. Pack classes.dex into unaligned.apk ==="
 Set-Location "$buildDir\dex"
 & $jar -uf "$buildDir\unaligned.apk" classes.dex
 Set-Location "d:\job-tracker"
+if ($LASTEXITCODE -ne 0) { throw "jar uf failed" }
 
 Write-Host "=== 6. Align APK (zipalign) ==="
 & $zipalign -v -f -p 4 "$buildDir\unaligned.apk" "$buildDir\aligned.apk"
+if ($LASTEXITCODE -ne 0) { throw "zipalign failed" }
 
 Write-Host "=== 7. Ensure Keystore exists ==="
 $keystore = "d:\job-tracker\android\applytrack.keystore"
